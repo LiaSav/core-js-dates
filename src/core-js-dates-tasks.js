@@ -156,8 +156,12 @@ function getCountDaysOnPeriod(dateStart, dateEnd) {
  * '2024-02-02', { start: '2024-02-02', end: '2024-03-02' } => true
  * '2024-02-10', { start: '2024-02-02', end: '2024-03-02' } => true
  */
-function isDateInPeriod(/* date, period */) {
-  throw new Error('Not implemented');
+function isDateInPeriod(date, period) {
+  const objDate = new Date(date);
+  const start = new Date(period.start);
+  const end = new Date(period.end);
+
+  return objDate >= start && objDate <= end;
 }
 
 /**
@@ -171,8 +175,24 @@ function isDateInPeriod(/* date, period */) {
  * '1999-01-05T02:20:00.000Z' => '1/5/1999, 2:20:00 AM'
  * '2010-12-15T22:59:00.000Z' => '12/15/2010, 10:59:00 PM'
  */
-function formatDate(/* date */) {
-  throw new Error('Not implemented');
+function formatDate(date) {
+  const newDate = new Date(date);
+  const month = newDate.getMonth() + 1;
+  const day = newDate.getUTCDate();
+  const year = newDate.getFullYear();
+  let hours = newDate.getUTCHours();
+  let time = 'AM';
+  const min = String(newDate.getMinutes()).padStart(2, 0);
+  const sec = String(newDate.getSeconds()).padStart(2, 0);
+
+  if (hours >= 12) {
+    if (hours >= 13) {
+      hours -= 12;
+    }
+    time = 'PM';
+  }
+
+  return `${month}/${day}/${year}, ${hours}:${min}:${sec} ${time}`;
 }
 
 /**
@@ -187,8 +207,20 @@ function formatDate(/* date */) {
  * 12, 2023 => 10
  * 1, 2024 => 8
  */
-function getCountWeekendsInMonth(/* month, year */) {
-  throw new Error('Not implemented');
+function getCountWeekendsInMonth(month, year) {
+  const dateEnd = new Date(year, month, 0);
+  let count = 0;
+
+  for (let day = 1; day <= dateEnd.getDate(); day += 1) {
+    const currentDay = new Date(year, month - 1, day);
+    const indexDay = currentDay.getDay();
+
+    if (indexDay === 6 || indexDay === 0) {
+      count += 1;
+    }
+  }
+
+  return count;
 }
 
 /**
@@ -204,8 +236,21 @@ function getCountWeekendsInMonth(/* month, year */) {
  * Date(2024, 0, 31) => 5
  * Date(2024, 1, 23) => 8
  */
-function getWeekNumberByDate(/* date */) {
-  throw new Error('Not implemented');
+function getWeekNumberByDate(date) {
+  const endDate = new Date(date);
+  const startDate = new Date(endDate.getFullYear(), 0, 1);
+  const msOneDay = 24 * 3600 * 1000;
+
+  const totalDays = Math.ceil((endDate - startDate) / msOneDay) + 1;
+
+  let firstDay = startDate.getDay();
+  if (firstDay === 0) {
+    firstDay = 7;
+  }
+
+  const daysInFirstWeek = 8 - firstDay;
+
+  return Math.ceil((totalDays - daysInFirstWeek) / 7) + 1;
 }
 
 /**
